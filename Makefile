@@ -1,4 +1,3 @@
-#
 # Makefile used to build and deploy Kestra locally.
 # By default Kestra will be installed under: $HOME/.kestra/current. Set $KESTRA_HOME to override default.
 #
@@ -37,7 +36,7 @@ build: clean
 	./gradlew build
 
 buildSkipTests: clean
-	./gradlew build -x test -x integrationTest -x testCodeCoverageReport --refresh-dependencies
+	./gradlew build -x test -x testCodeCoverageReport --refresh-dependencies
 
 test: clean
 	./gradlew test
@@ -113,7 +112,7 @@ kill:
 	else \
 		echo "No Kestra process to kill."; \
 	fi
-	docker compose -f ./docker-compose-ci.yml down;
+	docker-compose -f ./docker-compose-ci.yml down;
 
 # Default configuration for using Kestra with Postgres as backend.
 define KESTRA_POSTGRES_CONFIGURATION =
@@ -145,20 +144,21 @@ export KESTRA_POSTGRES_CONFIGURATION
 
 # Build and deploy Kestra in standalone mode (using Postgres backend)
 --private-start-standalone-postgres:
-	docker compose -f ./docker-compose-ci.yml up postgres -d;
-	echo "Waiting for postgres to be running"
+	docker-compose -f ./docker-compose-ci.yml up -d postgres; \
+	echo "Waiting for postgres to be running"; \
 	until [ "`docker inspect -f {{.State.Running}} kestra-postgres-1`"=="true" ]; do \
 		sleep 1; \
 	done; \
 	rm -rf ${KESTRA_BASEDIR}/bin/confs/ && \
 	mkdir -p ${KESTRA_BASEDIR}/bin/confs/ ${KESTRA_BASEDIR}/logs/ && \
-	touch ${KESTRA_BASEDIR}/bin/confs/application.yml
-	echo "Starting Kestra Standalone server"
+	touch ${KESTRA_BASEDIR}/bin/confs/application.yml; \
+	echo "Starting Kestra Standalone server"; \
 	KESTRA_CONFIGURATION=$$KESTRA_POSTGRES_CONFIGURATION ${KESTRA_BASEDIR}/bin/kestra \
 	server standalone \
 	--worker-thread ${KESTRA_WORKER_THREAD} \
 	--plugins "${KESTRA_BASEDIR}/plugins" \
 	--flow-path "${KESTRA_BASEDIR}/flows" 2>${KESTRA_BASEDIR}/logs/err.log 1>${KESTRA_BASEDIR}/logs/out.log &
+
 
 start-standalone-postgres: kill --private-start-standalone-postgres health
 
@@ -172,4 +172,3 @@ start-standalone-postgres: kill --private-start-standalone-postgres health
 	--flow-path "${KESTRA_BASEDIR}/flows" 2>${KESTRA_BASEDIR}/logs/err.log 1>${KESTRA_BASEDIR}/logs/out.log &
 
 start-standalone-local: kill --private-start-standalone-local health
-
