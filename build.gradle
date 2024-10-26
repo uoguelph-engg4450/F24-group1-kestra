@@ -52,8 +52,8 @@ idea {
  * Main
  **********************************************************************************************************************/
 mainClassName = "io.kestra.cli.App"
-sourceCompatibility = 21
-targetCompatibility = 21
+sourceCompatibility = '21'
+targetCompatibility = '21'
 
 dependencies {
     implementation project(":cli")

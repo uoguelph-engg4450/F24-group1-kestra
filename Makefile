@@ -37,7 +37,7 @@ build: clean
 	./gradlew build
 
 buildSkipTests: clean
-	./gradlew build -x test -x integrationTest -x testCodeCoverageReport --refresh-dependencies
+	./gradlew build -x test -x testCodeCoverageReport --refresh-dependencies --stacktrace
 
 test: clean
 	./gradlew test
@@ -113,7 +113,7 @@ kill:
 	else \
 		echo "No Kestra process to kill."; \
 	fi
-	docker compose -f ./docker-compose-ci.yml down;
+	docker-compose -f ./docker-compose-ci.yml down;
 
 # Default configuration for using Kestra with Postgres as backend.
 define KESTRA_POSTGRES_CONFIGURATION =
@@ -145,15 +145,15 @@ export KESTRA_POSTGRES_CONFIGURATION
 
 # Build and deploy Kestra in standalone mode (using Postgres backend)
 --private-start-standalone-postgres:
-	docker compose -f ./docker-compose-ci.yml up postgres -d;
-	echo "Waiting for postgres to be running"
-	until [ "`docker inspect -f {{.State.Running}} kestra-postgres-1`"=="true" ]; do \
+	docker-compose -f ./docker-compose-ci.yml up -d postgres; \
+	echo "Waiting for postgres to be running"; \
+	until [ "`docker inspect -f {{.State.Running}} f24-group1-kestra_postgres_1`"=="true" ]; do \
 		sleep 1; \
 	done; \
 	rm -rf ${KESTRA_BASEDIR}/bin/confs/ && \
 	mkdir -p ${KESTRA_BASEDIR}/bin/confs/ ${KESTRA_BASEDIR}/logs/ && \
-	touch ${KESTRA_BASEDIR}/bin/confs/application.yml
-	echo "Starting Kestra Standalone server"
+	touch ${KESTRA_BASEDIR}/bin/confs/application.yml; \
+	echo "Starting Kestra Standalone server"; \
 	KESTRA_CONFIGURATION=$$KESTRA_POSTGRES_CONFIGURATION ${KESTRA_BASEDIR}/bin/kestra \
 	server standalone \
 	--worker-thread ${KESTRA_WORKER_THREAD} \

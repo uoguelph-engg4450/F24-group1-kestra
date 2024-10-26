@@ -111,3 +111,23 @@ main {
     }
 }
 
+/* New styles for fixing indentation of Execution and Trigger sections */
+.execution-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.execution-item,
+.trigger-item {
+    margin-left: 20px; // Adjust indentation
+    padding-left: 10px; // Additional padding for readability
+    border-left: 2px solid #444; // Visual separator for alignment
+}
+
+.trigger-section,
+.variable-section {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 15px; // Extra indentation for nested items
+    margin-left: 5px;
+}
