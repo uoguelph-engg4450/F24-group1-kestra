@@ -54,3 +54,4 @@ core/src/main/resources/gradle.properties
 
 # Allure Reports
 **/allure-results/*
+openjdk-21+35_linux-x64_bin.tar.gz
