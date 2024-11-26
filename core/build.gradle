@@ -64,4 +64,8 @@ dependencies {
     testImplementation "io.micronaut:micronaut-http-client"
     testImplementation "io.micronaut:micronaut-http-server-netty"
     testImplementation "io.micronaut:micronaut-management"
+    implementation 'com.influxdb:influxdb-client-java:6.6.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.0'
+    implementation 'org.projectlombok:lombok:1.18.28'
+    annotationProcessor 'org.projectlombok:lombok:1.18.28'
 }

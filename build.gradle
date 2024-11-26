@@ -12,33 +12,22 @@ buildscript {
 }
 
 plugins {
-    // micronaut
     id "java"
-    id 'java-library'
+    id "java-library"
     id "idea"
     id "com.gradleup.shadow" version "8.3.5"
     id "application"
-
-    // test
     id "com.adarshr.test-logger" version "4.0.0"
     id "org.sonarqube" version "5.1.0.4882"
-    id 'jacoco-report-aggregation'
-
-    // helper
+    id "jacoco-report-aggregation"
     id "com.github.ben-manes.versions" version "0.51.0"
-
-    // front
-    id 'org.siouan.frontend-jdk21' version '9.1.0' apply false
-
-    // release
+    id "org.siouan.frontend-jdk21" version "9.1.0" apply false
     id "io.github.gradle-nexus.publish-plugin" version "2.0.0"
-    id 'net.researchgate.release' version '3.0.2'
+    id "net.researchgate.release" version "3.0.2"
     id "com.gorylenko.gradle-git-properties" version "2.4.2"
-    id 'signing'
-    id 'ru.vyarus.pom' version '3.0.0' apply false
-    id 'ru.vyarus.github-info' version '2.0.0' apply false
-
-    // OWASP dependency check
+    id "signing"
+    id "ru.vyarus.pom" version "3.0.0" apply false
+    id "ru.vyarus.github-info" version "2.0.0" apply false
     id "org.owasp.dependencycheck" version "11.1.0" apply false
 }
 
@@ -62,11 +51,33 @@ application {
 java {
     sourceCompatibility = targetJavaVersion
     targetCompatibility = targetJavaVersion
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
 }
 
 dependencies {
     implementation project(":cli")
     testImplementation project(":cli")
+
+    // JUnit 5
+    testImplementation "org.testng:testng:7.7.0"
+    testImplementation "org.junit.jupiter:junit-jupiter-engine:5.10.0"
+    testImplementation "org.junit.jupiter:junit-jupiter-params:5.10.0"
+    testImplementation "org.mockito:mockito-junit-jupiter:4.11.0"
+    testImplementation 'org.testng:testng:7.7.0'
+
+    annotationProcessor "org.projectlombok:lombok:1.18.30"
+    compileOnly "org.projectlombok:lombok:1.18.28"
+    testAnnotationProcessor "org.projectlombok:lombok:1.18.30"
+    testCompileOnly "org.projectlombok:lombok:1.18.28"
+
+
+
+
+    // Other test libraries
+    testImplementation "org.hamcrest:hamcrest:2.2"
+    testImplementation "org.hamcrest:hamcrest-library:2.2"
 }
 
 /**********************************************************************************************************************\
@@ -77,38 +88,36 @@ allprojects {
         group "io.kestra"
 
         java {
-            sourceCompatibility = targetJavaVersion
-            targetCompatibility = targetJavaVersion
+            sourceCompatibility = JavaVersion.VERSION_21
+            targetCompatibility = JavaVersion.VERSION_21
+            toolchain {
+                languageVersion = JavaLanguageVersion.of(21)
+            }
         }
 
         repositories {
             mavenCentral()
         }
 
-        // micronaut
         apply plugin: "java"
         apply plugin: "java-library"
         apply plugin: "idea"
         apply plugin: "jacoco"
 
         configurations {
-            developmentOnly // for dependencies that are needed for development only
+            developmentOnly
             micronaut
         }
 
-        // dependencies
         dependencies {
-            // Platform
             annotationProcessor enforcedPlatform(project(":platform"))
             implementation enforcedPlatform(project(":platform"))
             api enforcedPlatform(project(":platform"))
             micronaut enforcedPlatform(project(":platform"))
 
-            // lombok
             annotationProcessor "org.projectlombok:lombok"
-            compileOnly 'org.projectlombok:lombok'
+            compileOnly "org.projectlombok:lombok"
 
-            // micronaut
             annotationProcessor "io.micronaut:micronaut-inject-java"
             annotationProcessor "io.micronaut.validation:micronaut-validation-processor"
             micronaut "io.micronaut:micronaut-inject"
@@ -124,34 +133,30 @@ allprojects {
             micronaut "io.micronaut:micronaut-http-client"
             micronaut "io.micronaut.reactor:micronaut-reactor-http-client"
 
-            // logs
             implementation "org.slf4j:slf4j-api"
             implementation "ch.qos.logback:logback-classic"
             implementation "org.codehaus.janino:janino"
-            implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j'
-            implementation group: 'org.slf4j', name: 'jul-to-slf4j'
-            implementation group: 'org.slf4j', name: 'jcl-over-slf4j'
-            implementation group: 'org.fusesource.jansi', name: 'jansi'
+            implementation "org.apache.logging.log4j:log4j-to-slf4j"
+            implementation "org.slf4j:jul-to-slf4j"
+            implementation "org.slf4j:jcl-over-slf4j"
+            implementation "org.fusesource.jansi:jansi"
 
-            // jackson
-            implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core'
-            implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind'
-            implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations'
-            implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml'
-            implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-parameter-names'
-            implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-guava'
-            implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310'
+            implementation "com.fasterxml.jackson.core:jackson-core"
+            implementation "com.fasterxml.jackson.core:jackson-databind"
+            implementation "com.fasterxml.jackson.core:jackson-annotations"
+            implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml"
+            implementation "com.fasterxml.jackson.module:jackson-module-parameter-names"
+            implementation "com.fasterxml.jackson.datatype:jackson-datatype-guava"
+            implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310"
 
-            // kestra
-            implementation group: 'com.devskiller.friendly-id', name: 'friendly-id'
+            implementation "com.devskiller.friendly-id:friendly-id"
             implementation (group: 'net.thisptr', name: 'jackson-jq') {
                 exclude group: 'com.fasterxml.jackson.core'
             }
 
-            // exposed utils
-            api group: 'com.google.guava', name: 'guava'
-            api group: 'commons-io', name: 'commons-io'
-            api group: 'org.apache.commons', name: 'commons-lang3'
+            api "com.google.guava:guava"
+            api "commons-io:commons-io"
+            api "org.apache.commons:commons-lang3"
             api "io.swagger.core.v3:swagger-annotations"
         }
     }
@@ -170,57 +175,31 @@ subprojects {
         }
 
         dependencies {
-            // Platform
             testAnnotationProcessor enforcedPlatform(project(":platform"))
             testImplementation enforcedPlatform(project(":platform"))
 
-            // lombok
             testAnnotationProcessor "org.projectlombok:lombok:"
-            testCompileOnly 'org.projectlombok:lombok'
+            testCompileOnly "org.projectlombok:lombok"
 
-            // micronaut
             testAnnotationProcessor "io.micronaut:micronaut-inject-java"
             testAnnotationProcessor "io.micronaut.validation:micronaut-validation-processor"
             testImplementation "io.micronaut.test:micronaut-test-junit5"
+            testImplementation "org.junit.jupiter:junit-jupiter:5.10.0"
+            testImplementation "org.mockito:mockito-junit-jupiter:4.11.0"
+            annotationProcessor "org.projectlombok:lombok:1.18.28"
+            compileOnly "org.projectlombok:lombok:1.18.28"
 
-            testImplementation "org.junit.jupiter:junit-jupiter-engine"
-            testImplementation "org.junit.jupiter:junit-jupiter-params"
-            testImplementation "org.junit-pioneer:junit-pioneer"
-            testImplementation 'org.mockito:mockito-junit-jupiter'
+            testAnnotationProcessor "org.projectlombok:lombok:1.18.28"
+            testCompileOnly "org.projectlombok:lombok:1.18.28"
 
-            // hamcrest
-            testImplementation 'org.hamcrest:hamcrest'
-            testImplementation 'org.hamcrest:hamcrest-library'
-            testImplementation 'org.exparity:hamcrest-date'
+
         }
 
-        test {
-            useJUnitPlatform()
-
-            maxHeapSize = "4048m"
-
-            // configure en_US default locale for tests
-            systemProperty 'user.language', 'en'
-            systemProperty 'user.country', 'US'
-
-            environment 'SECRET_MY_SECRET', "{\"secretKey\":\"secretValue\"}".bytes.encodeBase64().toString()
-            environment 'SECRET_NEW_LINE', "cGFzc3dvcmR2ZXJ5dmVyeXZleXJsb25ncGFzc3dvcmR2ZXJ5dmVyeXZleXJsb25ncGFzc3dvcmR2\nZXJ5dmVyeXZleXJsb25ncGFzc3dvcmR2ZXJ5dmVyeXZleXJsb25ncGFzc3dvcmR2ZXJ5dmVyeXZl\neXJsb25n"
-            environment 'SECRET_WEBHOOK_KEY', "secretKey".bytes.encodeBase64().toString()
-            environment 'SECRET_NON_B64_SECRET', "some secret value"
-            environment 'SECRET_PASSWORD', "cGFzc3dvcmQ="
-            environment 'KESTRA_TEST1', "true"
-            environment 'KESTRA_TEST2', "Pass by env"
-        }
-
-        testlogger {
-            theme 'mocha-parallel'
-            showExceptions true
-            showFullStackTraces true
-            showCauses true
-            slowThreshold 2000
-            showStandardStreams true
-            showPassedStandardStreams false
-            showSkippedStandardStreams true
+        tasks.test {
+            useTestNG()
+            testLogging {
+                events "passed", "skipped", "failed"
+            }
         }
     }
 }
@@ -357,6 +336,7 @@ dependencyCheck {
 allprojects {
     gradle.projectsEvaluated {
         tasks.withType(JavaCompile).configureEach {
+            options.annotationProcessorPath = configurations.annotationProcessor
             options.encoding = "UTF-8"
             options.compilerArgs.add("-parameters")
             options.compilerArgs.add("-Xlint:all")
@@ -366,6 +346,7 @@ allprojects {
 }
 
 tasks.withType(JavaCompile).configureEach {
+    options.annotationProcessorPath = configurations.annotationProcessor
     options.encoding = "UTF-8"
     options.compilerArgs.add("-parameters")
 }
