@@ -1,8 +1,8 @@
 package io.kestra.plugin.core.InfluxDB;
-
 import org.junit.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
-import static org.junit.*;
 
 public class InfluxDBPluginTest {
     private InfluxDBPlugin influxDBPlugin;
