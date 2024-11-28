@@ -11,6 +11,12 @@ public class InfluxDBPlugin {
 
     // Method to connect to InfluxDB
     public boolean connect(String url, String database, String username, String password) {
+        // Validate inputs
+        if (url == null || url.isEmpty() || database == null || database.isEmpty()) {
+            System.err.println("Invalid parameters: URL or Database cannot be null or empty.");
+            return false;
+        }
+
         try {
             this.url = url;
             this.database = database;
@@ -19,7 +25,7 @@ public class InfluxDBPlugin {
 
             // Simulate connection logic
             System.out.println("Connecting to InfluxDB with URL: " + url);
-            // Assume successful connection
+            // Assume connection is successful for valid parameters
             return true;
         } catch (Exception e) {
             System.err.println("Failed to connect to InfluxDB: " + e.getMessage());
@@ -29,6 +35,11 @@ public class InfluxDBPlugin {
 
     // Method to insert data into InfluxDB
     public boolean insertData(String measurement, String fields) {
+        if (measurement == null || measurement.isEmpty() || fields == null || fields.isEmpty()) {
+            System.err.println("Invalid parameters: Measurement or Fields cannot be null or empty.");
+            return false;
+        }
+
         try {
             // Simulate data insertion logic
             System.out.println("Inserting data into measurement: " + measurement + " with fields: " + fields);

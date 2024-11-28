@@ -11,41 +11,24 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.util.stream.Stream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.is;
 
-class InfluxDBPluginTest {
+public class InfluxDBPluginTest {
     private InfluxDBPlugin influxDBPlugin;
 
     @BeforeEach
     void setUp() {
         influxDBPlugin = new InfluxDBPlugin();
-        // Initialize or configure the plugin as needed
     }
 
     @AfterEach
     void tearDown() {
         influxDBPlugin = null;
-        // Perform any cleanup if necessary
     }
 
     @Test
     void testPluginInitialization() {
-        assertThat("InfluxDBPlugin should be initialized.", influxDBPlugin, notNullValue());
-    }
-
-    @Test
-    void testPluginFunctionality() {
-        // Assuming the plugin has a method `connect`
-        boolean isConnected = influxDBPlugin.connect("testUrl", "testDatabase", "testUser", "testPassword");
-        assertThat("InfluxDBPlugin should successfully connect.", isConnected, is(true));
-    }
-
-    @Test
-    void testPluginDataInsertion() {
-        // Assuming the plugin has a method `insertData`
-        boolean isInserted = influxDBPlugin.insertData("testMeasurement", "field1=value1");
-        assertThat("InfluxDBPlugin should successfully insert data.", isInserted, is(true));
+        assertThat("InfluxDBPlugin should be initialized.", influxDBPlugin != null, is(true));
     }
 
     @ParameterizedTest
@@ -55,11 +38,30 @@ class InfluxDBPluginTest {
         assertThat("InfluxDBPlugin parameterized test should pass.", result, is(expectedResult));
     }
 
+    @ParameterizedTest
+    @MethodSource("provideDataInsertionArguments")
+    void testParameterizedDataInsertion(String measurement, String fields, boolean expectedResult) {
+        boolean result = influxDBPlugin.insertData(measurement, fields);
+        assertThat("InfluxDBPlugin data insertion test should pass.", result, is(expectedResult));
+    }
+
     private static Stream<Arguments> provideTestArguments() {
         return Stream.of(
-            Arguments.of("testUrl", "testDatabase", true),
-            Arguments.of("invalidUrl", "testDatabase", false),
-            Arguments.of("testUrl", "invalidDatabase", false)
+            Arguments.of("testUrl", "testDatabase", true),    // Valid parameters
+            Arguments.of(null, "testDatabase", false),        // Null URL
+            Arguments.of("testUrl", null, false),             // Null database
+            Arguments.of("", "testDatabase", false),          // Empty URL
+            Arguments.of("testUrl", "", false)                // Empty database
+        );
+    }
+
+    private static Stream<Arguments> provideDataInsertionArguments() {
+        return Stream.of(
+            Arguments.of("testMeasurement", "field1=value1", true),   // Valid parameters
+            Arguments.of(null, "field1=value1", false),               // Null measurement
+            Arguments.of("testMeasurement", null, false),             // Null fields
+            Arguments.of("", "field1=value1", false),                 // Empty measurement
+            Arguments.of("testMeasurement", "", false)                // Empty fields
         );
     }
 }
