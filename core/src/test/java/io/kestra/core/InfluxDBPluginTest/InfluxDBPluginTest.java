@@ -1,44 +1,65 @@
 package io.kestra.core.InfluxDBPluginTest;
 
 import io.kestra.plugin.core.InfluxDB.InfluxDBPlugin;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import java.util.stream.Stream;
 
-public class InfluxDBPluginTest {
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.is;
+
+class InfluxDBPluginTest {
     private InfluxDBPlugin influxDBPlugin;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         influxDBPlugin = new InfluxDBPlugin();
         // Initialize or configure the plugin as needed
     }
 
-    @After
-    public void tearDown() {
+    @AfterEach
+    void tearDown() {
         influxDBPlugin = null;
         // Perform any cleanup if necessary
     }
 
     @Test
-    public void testPluginInitialization() {
-        assertNotNull("InfluxDBPlugin should be initialized.", influxDBPlugin);
+    void testPluginInitialization() {
+        assertThat("InfluxDBPlugin should be initialized.", influxDBPlugin, notNullValue());
     }
 
     @Test
-    public void testPluginFunctionality() {
-        // Assuming the plugin has a method `connect` for this example
+    void testPluginFunctionality() {
+        // Assuming the plugin has a method `connect`
         boolean isConnected = influxDBPlugin.connect("testUrl", "testDatabase", "testUser", "testPassword");
-        assertTrue("InfluxDBPlugin should successfully connect.", isConnected);
+        assertThat("InfluxDBPlugin should successfully connect.", isConnected, is(true));
     }
 
     @Test
-    public void testPluginDataInsertion() {
-        // Assuming a method `insertData`
+    void testPluginDataInsertion() {
+        // Assuming the plugin has a method `insertData`
         boolean isInserted = influxDBPlugin.insertData("testMeasurement", "field1=value1");
-        assertTrue("InfluxDBPlugin should successfully insert data.", isInserted);
+        assertThat("InfluxDBPlugin should successfully insert data.", isInserted, is(true));
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideTestArguments")
+    void testParameterizedBehavior(String url, String database, boolean expectedResult) {
+        boolean result = influxDBPlugin.connect(url, database, "testUser", "testPassword");
+        assertThat("InfluxDBPlugin parameterized test should pass.", result, is(expectedResult));
+    }
+
+    private static Stream<Arguments> provideTestArguments() {
+        return Stream.of(
+            Arguments.of("testUrl", "testDatabase", true),
+            Arguments.of("invalidUrl", "testDatabase", false),
+            Arguments.of("testUrl", "invalidDatabase", false)
+        );
     }
 }
